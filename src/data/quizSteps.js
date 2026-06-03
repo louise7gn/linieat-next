@@ -1,0 +1,185 @@
+export const quizSteps = [
+  {
+    id: 1,
+    key: 'genre',
+    question: 'Tu es...',
+    sub: 'Ça nous aide à calibrer tes besoins caloriques.',
+    type: 'choice',
+    choices: [
+      { label: 'Une femme', value: 'femme' },
+      { label: 'Un homme', value: 'homme' },
+      { label: 'Autre', value: 'autre' },
+    ]
+  },
+  {
+    id: 2,
+    key: 'age',
+    question: 'Ton âge ?',
+    sub: 'Entre 15 et 80 ans.',
+    type: 'number',
+    placeholder: 'Ex : 22',
+    min: 15,
+    max: 80,
+  },
+  {
+    id: 3,
+    key: 'poids',
+    question: 'Ton poids actuel ?',
+    sub: 'En kilogrammes.',
+    type: 'number',
+    placeholder: 'Ex : 65',
+    min: 30,
+    max: 200,
+    unit: 'kg',
+  },
+  {
+    id: 4,
+    key: 'taille',
+    question: 'Ta taille ?',
+    sub: 'En centimètres.',
+    type: 'number',
+    placeholder: 'Ex : 170',
+    min: 130,
+    max: 220,
+    unit: 'cm',
+  },
+  {
+    id: 5,
+    key: 'objectif',
+    question: 'Ton objectif principal ?',
+    sub: 'Sois honnête — c\'est la clé de tout.',
+    type: 'choice',
+    choices: [
+      { label: 'Perdre du poids', value: 'perte' },
+      { label: 'Prendre du muscle', value: 'muscu' },
+      { label: 'Être plus fit & tonique', value: 'fit' },
+      { label: 'Maintenir mon poids', value: 'maintien' },
+      { label: 'Manger mieux au quotidien', value: 'sante' },
+      { label: 'Performance sportive', value: 'cardio' },
+    ]
+  },
+  {
+    id: 6,
+    key: 'sport',
+    question: 'Tu fais du sport...',
+    sub: 'Compte toutes tes activités physiques.',
+    type: 'choice',
+    choices: [
+      { label: 'Jamais ou presque', value: 'sedentaire' },
+      { label: '1-2 fois par semaine', value: 'leger' },
+      { label: '3-4 fois par semaine', value: 'modere' },
+      { label: '5-6 fois par semaine', value: 'actif' },
+      { label: 'Tous les jours', value: 'tres-actif' },
+    ]
+  },
+  {
+    id: 7,
+    key: 'cardio-pct',
+    question: 'Quel type de sport fais-tu ?',
+    sub: 'Ça influence tes besoins en protéines.',
+    type: 'choice',
+    choices: [
+      { label: 'Surtout de la musculation', value: 'muscu' },
+      { label: 'Mix muscu + cardio', value: 'mix' },
+      { label: 'Surtout du cardio', value: 'cardio' },
+      { label: 'Sport collectif / autre', value: 'autre' },
+    ],
+    condition: (data) => data.sport !== 'sedentaire',
+  },
+  {
+    id: 8,
+    key: 'regime',
+    question: 'Tu as un régime alimentaire particulier ?',
+    sub: 'On adapte toutes les recettes en conséquence.',
+    type: 'choice',
+    choices: [
+      { label: 'Aucun', value: 'aucun' },
+      { label: 'Végétarien', value: 'vegetarien' },
+      { label: 'Vegan', value: 'vegan' },
+      { label: 'Sans gluten', value: 'sans-gluten' },
+      { label: 'Sans lactose', value: 'sans-lactose' },
+      { label: 'Halal', value: 'halal' },
+    ]
+  },
+  {
+    id: 9,
+    key: 'repas',
+    question: 'Combien de repas par jour ?',
+    sub: 'On répartit tes macros selon ça.',
+    type: 'choice',
+    choices: [
+      { label: '2 repas', value: 2 },
+      { label: '3 repas', value: 3 },
+      { label: '4 repas', value: 4 },
+      { label: '5 repas ou plus', value: 5 },
+    ]
+  },
+  {
+    id: 10,
+    key: 'budget',
+    question: 'Ton budget courses par semaine ?',
+    sub: 'Pour des recettes adaptées à ton portefeuille.',
+    type: 'choice',
+    choices: [
+      { label: 'Moins de 30€', value: 'low' },
+      { label: '30€ - 60€', value: 'medium' },
+      { label: '60€ - 100€', value: 'high' },
+      { label: 'Pas de limite', value: 'unlimited' },
+    ]
+  },
+  {
+    id: 11,
+    key: 'temps-cuisine',
+    question: 'Combien de temps en cuisine ?',
+    sub: 'Par repas, en moyenne.',
+    type: 'choice',
+    choices: [
+      { label: 'Moins de 15 min', value: 'express' },
+      { label: '15 - 30 min', value: 'rapide' },
+      { label: '30 - 60 min', value: 'normal' },
+      { label: 'J\'aime cuisiner longtemps', value: 'long' },
+    ]
+  },
+  {
+    id: 12,
+    key: 'aliments-aimes',
+    question: 'Ce que tu adores manger ?',
+    sub: 'Tape un aliment et sélectionne. Ajoutes-en autant que tu veux.',
+    type: 'food-input',
+    foodType: 'love',
+  },
+  {
+    id: 13,
+    key: 'aliments-evites',
+    question: 'Ce que tu ne veux pas voir dans tes recettes ?',
+    sub: 'Allergies, dégoûts, peu importe la raison.',
+    type: 'food-input',
+    foodType: 'avoid',
+  },
+  {
+    id: 14,
+    key: 'grignotage',
+    question: 'Tu grignottes entre les repas ?',
+    sub: 'On peut inclure des snacks dans ton planning.',
+    type: 'choice',
+    choices: [
+      { label: 'Jamais', value: 'jamais' },
+      { label: 'Parfois', value: 'parfois' },
+      { label: 'Souvent', value: 'souvent' },
+      { label: 'Tout le temps', value: 'toujours' },
+    ]
+  },
+  {
+    id: 15,
+    key: 'organisation',
+    question: 'Comment tu t\'organises en cuisine ?',
+    sub: 'Pour adapter ton planning.',
+    type: 'choice',
+    choices: [
+      { label: 'Je cuisine au jour le jour', value: 'quotidien' },
+      { label: 'Je prépare pour 2-3 jours', value: 'batch-light' },
+      { label: 'Je fais du batch cooking le weekend', value: 'batch' },
+      { label: 'J\'aime varier chaque jour', value: 'varie' },
+    ]
+  },
+]
