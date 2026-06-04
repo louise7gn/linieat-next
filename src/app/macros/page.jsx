@@ -1,5 +1,6 @@
+'use client'
 import Layout from '@/components/Layout'
-import Recettes from '@/components/Macros'
+import Macros from '@/components/Macros'
 
 export default function MacrosPage() {
   return (
