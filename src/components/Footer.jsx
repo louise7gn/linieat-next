@@ -1,4 +1,4 @@
-function Footer() {
+export default function Footer() {
   return (
     <footer style={{
       width: '100%',
@@ -16,5 +16,3 @@ function Footer() {
     </footer>
   )
 }
-
-export default Footer
