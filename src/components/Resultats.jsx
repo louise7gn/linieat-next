@@ -1,52 +1,108 @@
 'use client'
 import { useRouter } from 'next/navigation'
-import { useQuiz } from '../context/QuizContext'
-import { calcMacros } from '../data/macroCalc'
+import { calcMacros, getVersionIdx } from '../data/macroCalc'
 import { recipes } from '../data/recipes'
 import RecipeCard from './RecipeCard'
-import { useState } from 'react'
 import RecipeDetail from './RecipeDetail'
+import { useState, useEffect } from 'react'
+import { supabase } from '@/utils/supabaseClient'
+
+function shuffle(arr) {
+  return [...arr].sort(() => Math.random() - 0.5)
+}
 
 export default function Resultats() {
   const router = useRouter()
-  const { data, completed } = useQuiz()
   const [selected, setSelected] = useState(null)
+  const [quizData, setQuizData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [recettesFiltered, setRecettesFiltered] = useState([])
 
-  if (!completed) {
-    return (
-      <div style={{ paddingTop: '60px', textAlign: 'center' }}>
-        <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '24px', color: 'var(--text)', marginBottom: '12px' }}>
-          Tu n'as pas encore fait le quiz !
-        </h2>
-        <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px' }}>
-          Réponds aux questions pour voir tes recettes personnalisées.
-        </p>
-        <button onClick={() => router.push('/quiz')} style={{
-          background: 'var(--rose)', color: 'white', border: 'none',
-          borderRadius: '30px', padding: '14px 28px', fontSize: '14px',
-          cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-        }}>
-          Faire le quiz →
-        </button>
-      </div>
-    )
-  }
+  useEffect(() => {
+    const load = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) { setLoading(false); return }
+      const { data } = await supabase
+        .from('user_quiz_results')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single()
+      if (data) setQuizData(data)
+      setLoading(false)
+    }
+    load()
+  }, [])
 
-  const macros = calcMacros(data)
+  useEffect(() => {
+    if (!quizData) return
 
-  // Filtrer les recettes selon régime et aliments évités
-  const evites = data['aliments-evites'] || []
-  const regime = data.regime || 'aucun'
+    const versionIdx = getVersionIdx(quizData.goal)
+    const evites = (quizData.aliments_evites || []).map(s => s.toLowerCase())
+    const aimes = (quizData.aliments_aimes || []).map(s => s.toLowerCase())
 
-  const recettesFiltered = recipes.filter(r => {
-    if (regime === 'vegan' && !r.tags.includes('vegan')) return false
-    return true
-  }).slice(0, 9)
+    function recipeHasEvite(recipe) {
+      if (!evites.length) return false
+      return recipe.versions.some(v =>
+        i => aimes.some(a => i.name.toLowerCase().includes(a))
+      )
+    }
+
+    function recipeScore(recipe) {
+      if (!aimes.length) return 0
+      return recipe.versions[versionIdx]?.ing.filter(
+        ([ing]) => aimes.some(a => ing.toLowerCase().includes(a))
+      ).length || 0
+    }
+
+    const saleFiltered = shuffle(
+      recipes.filter(r => r.cat === 'sale' && !recipeHasEvite(r))
+    ).sort((a, b) => recipeScore(b) - recipeScore(a)).slice(0, 2)
+
+    const sucreFiltered = shuffle(
+      recipes.filter(r => r.cat === 'sucre' && !recipeHasEvite(r))
+    ).sort((a, b) => recipeScore(b) - recipeScore(a)).slice(0, 1)
+
+    setRecettesFiltered([...saleFiltered, ...sucreFiltered])
+  }, [quizData])
+
+  if (loading) return (
+    <div style={{ paddingTop: '60px', textAlign: 'center' }}>
+      <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Chargement...</p>
+    </div>
+  )
+
+  if (!quizData) return (
+    <div style={{ paddingTop: '60px', textAlign: 'center' }}>
+      <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '24px', color: 'var(--text)', marginBottom: '12px' }}>
+        Tu n'as pas encore fait le quiz !
+      </h2>
+      <p style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '24px' }}>
+        Réponds aux questions pour voir tes recettes personnalisées.
+      </p>
+      <button onClick={() => router.push('/quiz')} style={{
+        background: 'var(--rose)', color: 'white', border: 'none',
+        borderRadius: '30px', padding: '14px 28px', fontSize: '14px',
+        cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+      }}>
+        Faire le quiz →
+      </button>
+    </div>
+  )
+
+  const macros = calcMacros({
+    genre: quizData.gender,
+    poids: quizData.weight,
+    taille: quizData.height,
+    age: quizData.age,
+    sport: quizData.activity,
+    objectif: quizData.goal,
+    'cardio-pct': quizData.cardio_pct,
+  })
+
+  const versionIdx = getVersionIdx(quizData.goal)
 
   return (
     <div style={{ paddingTop: '24px', paddingBottom: '60px' }}>
-
-      {/* Hero macros */}
       <div style={{
         background: 'white', borderRadius: '20px',
         border: '0.5px solid var(--border)',
@@ -62,7 +118,6 @@ export default function Resultats() {
         <p style={{ fontSize: '13px', color: 'var(--text-muted)', fontWeight: '300', marginBottom: '20px' }}>
           On a calculé exactement ce qu'il te faut.
         </p>
-
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
           {[
             ['Calories', `${macros.calories}`, 'kcal/jour'],
@@ -79,18 +134,21 @@ export default function Resultats() {
         </div>
       </div>
 
-      {/* Recettes recommandées */}
       <h3 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '22px', color: 'var(--text)', marginBottom: '16px' }}>
         Tes recettes recommandées
       </h3>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '40px' }}>
         {recettesFiltered.map(rec => (
-          <RecipeCard key={rec.id} recipe={rec} onClick={() => setSelected(rec)} />
+          <RecipeCard
+            key={rec.id}
+            recipe={rec}
+            versionIdx={versionIdx}
+            onClick={() => setSelected(rec)}
+          />
         ))}
       </div>
 
-      {/* CTA planning */}
       <div style={{
         background: 'var(--rose-dark)', borderRadius: '20px',
         padding: '32px', textAlign: 'center',
@@ -110,7 +168,7 @@ export default function Resultats() {
         </button>
       </div>
 
-      {selected && <RecipeDetail recipe={selected} onClose={() => setSelected(null)} />}
+      {selected && <RecipeDetail recipe={selected} versionIdx={versionIdx} onClose={() => setSelected(null)} />}
     </div>
   )
 }

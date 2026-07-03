@@ -1,9 +1,13 @@
 'use client'
 import { useState } from 'react'
+import { scaleRecipe, computeVersionMacros } from '../data/scaleRecipe'
 
-export default function RecipeDetail({ recipe, onClose }) {
-  const [activeVersion, setActiveVersion] = useState(0)
+export default function RecipeDetail({ recipe, versionIdx = 1, onClose, personnes = 1 }) {
+  const [activeVersion, setActiveVersion] = useState(versionIdx)
+
   const version = recipe.versions[activeVersion]
+  const { ing } = scaleRecipe(version, null, personnes)   // quantités pour N personnes, rien d'autre
+  const macros = computeVersionMacros(version)             // macros fixes de la version — cohérentes avec le planning
 
   return (
     <div
@@ -39,17 +43,11 @@ export default function RecipeDetail({ recipe, onClose }) {
             width: '32px', height: '32px', cursor: 'pointer',
             fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-          }}>
-            ×
-          </button>
+          }}>×</button>
         </div>
 
         <div style={{ padding: '24px 28px 32px' }}>
-          {/* Titre */}
-          <h2 style={{
-            fontFamily: "'DM Serif Display', serif",
-            fontSize: '26px', color: 'var(--text)', marginBottom: '16px',
-          }}>
+          <h2 style={{ fontFamily: "'DM Serif Display', serif", fontSize: '26px', color: 'var(--text)', marginBottom: '16px' }}>
             {recipe.titre}
           </h2>
 
@@ -71,20 +69,14 @@ export default function RecipeDetail({ recipe, onClose }) {
           </div>
 
           {/* Macros */}
-          <div style={{
-            display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-            gap: '8px', marginBottom: '24px',
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '24px' }}>
             {[
-              ['Calories', `${version.k} kcal`],
-              ['Protéines', version.p],
-              ['Glucides', version.g],
-              ['Lipides', version.li],
+              ['Calories', `${macros.calories} kcal`],
+              ['Protéines', `${macros.proteines}g`],
+              ['Glucides', `${macros.glucides}g`],
+              ['Lipides', `${macros.lipides}g`],
             ].map(([label, val]) => (
-              <div key={label} style={{
-                background: 'var(--bg)', borderRadius: '12px',
-                padding: '12px', textAlign: 'center',
-              }}>
+              <div key={label} style={{ background: 'var(--bg)', borderRadius: '12px', padding: '12px', textAlign: 'center' }}>
                 <div style={{ fontSize: '15px', fontWeight: '500', color: 'var(--text)' }}>{val}</div>
                 <div style={{ fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px' }}>{label}</div>
               </div>
@@ -92,19 +84,21 @@ export default function RecipeDetail({ recipe, onClose }) {
           </div>
 
           {/* Infos */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap' }}>
-            {[
-              ['⏱', `${version.t}`],
-              ['👥', `${version.n} pers.`],
-            ].map(([icon, val]) => (
-              <span key={val} style={{
-                fontSize: '12px', color: 'var(--text-muted)',
-                background: 'var(--bg)', padding: '4px 12px',
-                borderRadius: '8px',
-              }}>
-                {icon} {val}
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 12px', borderRadius: '8px' }}>
+              ⏱ {`${recipe.temps} min`}
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 12px', borderRadius: '8px' }}>
+              {personnes} pers.
+            </span>
+            <span style={{ fontSize: '11px', color: 'var(--rose)', background: 'var(--rose-light)', padding: '4px 12px', borderRadius: '8px' }}>
+              Valeurs CIQUAL 2020
+            </span>
+            {recipe.tags.includes('batch') && (
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)', background: 'var(--bg)', padding: '4px 12px', borderRadius: '8px' }}>
+                Batch cooking possible
               </span>
-            ))}
+            )}
           </div>
 
           {/* Ingrédients */}
@@ -112,16 +106,23 @@ export default function RecipeDetail({ recipe, onClose }) {
             Ingrédients
           </h3>
           <ul style={{ listStyle: 'none', marginBottom: '24px' }}>
-            {version.ing.map(([name, qty], i) => (
-              <li key={i} style={{
-                display: 'flex', justifyContent: 'space-between',
-                padding: '7px 0', borderBottom: '0.5px solid var(--bg)',
-                fontSize: '13px', color: 'var(--text)',
-              }}>
-                <span>{name}</span>
-                <span style={{ color: 'var(--text-muted)', fontWeight: '500' }}>{qty}</span>
-              </li>
-            ))}
+            {ing.map((item, i) => {
+              if (item.role === 'condiment' && !item.qtyDisplay) return (
+                <li key={i} style={{ padding: '7px 0', borderBottom: '0.5px solid var(--bg)', fontSize: '13px', color: 'var(--text-muted)' }}>
+                  {item.name}
+                </li>
+              )
+              return (
+                <li key={i} style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  padding: '7px 0', borderBottom: '0.5px solid var(--bg)',
+                  fontSize: '13px', color: 'var(--text)',
+                }}>
+                  <span>{item.name}</span>
+                  <span style={{ color: 'var(--text-muted)', fontWeight: '500' }}>{item.qtyDisplay}</span>
+                </li>
+              )
+            })}
           </ul>
 
           {/* Préparation */}

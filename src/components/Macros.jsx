@@ -24,7 +24,6 @@ function calcMacros(genre, age, poids, taille, sport, objectif, sportType) {
     'muscu': +300,
     'fit': -150,
     'maintien': 0,
-    'sante': 0,
     'cardio': +200,
   }
   const calories = Math.round(tdee + (objectifMap[objectif] || 0))
@@ -239,7 +238,6 @@ export default function Macros() {
               { value: 'fit', label: 'Fit & tonique' },
               { value: 'muscu', label: 'Prise de muscle' },
               { value: 'maintien', label: 'Maintien' },
-              { value: 'sante', label: 'Santé' },
               { value: 'cardio', label: 'Performance' },
             ].map(o => (
               <button key={o.value} onClick={() => set('objectif', o.value)} style={{
@@ -341,7 +339,7 @@ export default function Macros() {
           padding: '16px 20px', fontSize: '12px',
           color: 'var(--text-muted)', lineHeight: '1.6',
         }}>
-        Ces chiffres sont une estimation basée sur ta physiologie. Ton corps, tes règles — ajuste selon tes sensations et tes résultats réels.
+        Ces chiffres sont une estimation basée sur ta physiologie. Ton corps, tes règles : ajuste selon tes sensations et tes résultats réels.
         </div>
       )}
     </div>

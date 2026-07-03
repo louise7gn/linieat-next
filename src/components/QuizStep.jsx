@@ -70,5 +70,45 @@ export default function QuizStep({ step, value, onChange }) {
     )
   }
 
+  if (step.type === 'multi-choice') {
+    const selected = Array.isArray(value) ? value : []
+    const toggle = (val) => {
+      const next = selected.includes(val)
+        ? selected.filter(v => v !== val)
+        : [...selected, val]
+      onChange(next)
+    }
+    return (
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(2, 1fr)',
+        gap: '10px',
+      }}>
+        {step.choices.map(choice => {
+          const active = selected.includes(choice.value)
+          return (
+            <button
+              key={choice.value}
+              onClick={() => toggle(choice.value)}
+              style={{
+                padding: '14px 20px',
+                borderRadius: '14px',
+                border: `2px solid ${active ? 'var(--rose)' : 'var(--border)'}`,
+                background: active ? 'var(--rose-light)' : 'white',
+                color: active ? 'var(--rose)' : 'var(--text)',
+                fontSize: '13px', fontWeight: active ? '500' : '400',
+                cursor: 'pointer', textAlign: 'left',
+                fontFamily: "'DM Sans', sans-serif",
+                transition: 'all 0.15s',
+              }}
+            >
+              {active ? '✓ ' : ''}{choice.label}
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   return null
 }

@@ -4,20 +4,18 @@ import { useQuiz } from '../context/QuizContext'
 import { quizSteps } from '../data/quizSteps'
 import QuizProgress from './QuizProgress'
 import QuizStep from './QuizStep'
+import { supabase } from '@/utils/supabaseClient'
+import { useState } from 'react'
 
 export default function Quiz() {
   const router = useRouter()
-  const { data, step, answer, next, prev, finish } = useQuiz()
+  const { data, answer, finish } = useQuiz()
+  const [currentIndex, setCurrentIndex] = useState(0)
 
-  // Filtrer les étapes visibles selon conditions
   const visibleSteps = quizSteps.filter(s => {
     if (!s.condition) return true
     return s.condition(data)
   })
-
-  const currentIndex = visibleSteps.findIndex(s => s.id === step) === -1
-    ? 0
-    : visibleSteps.findIndex(s => s.id === step)
 
   const currentStep = visibleSteps[currentIndex]
   const total = visibleSteps.length
@@ -27,31 +25,62 @@ export default function Quiz() {
     !(Array.isArray(currentValue) && currentValue.length === 0) &&
     currentValue !== ''
 
-  function handleNext() {
+  async function handleNext() {
     if (currentIndex < visibleSteps.length - 1) {
-      const nextStep = visibleSteps[currentIndex + 1]
-      answer('__step', nextStep.id)
-      next()
+      setCurrentIndex(currentIndex + 1)
     } else {
       finish()
-      router.push('/resultats')
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        const { error } = await supabase
+          .from('user_quiz_results')
+          .upsert({
+            user_id:         session.user.id,
+            weight:          data.poids,
+            height:          data.taille,
+            age:             data.age,
+            gender:          data.genre,
+            activity:        data.sport,
+            cardio_pct:      data['cardio-pct'],
+            pas:             data.pas,
+            goal:            data.objectif,
+            petit_dej:       data['petit-dej'],
+            petit_dej_type:  data['petit-dej-type'],
+            gouter:          data['gouter'],
+            gouter_type:     data['gouter-type'],
+            dessert:         data['dessert'],
+            regime:          data.regime,
+            aliments_evites: data['aliments-evites'] || [],
+            aliments_aimes:  data['aliments-aimes']  || [],
+            budget:          data.budget,
+            temps_cuisine:   data['temps-cuisine'],
+            batch_cooking:   data['batch-cooking'],
+            batch_repas:     data['batch-repas'] || [],
+            personnes:       data.personnes || 1,
+            macros:          null,
+          }, { onConflict: 'user_id' })
+        console.log('upsert error:', error)
+
+        // Les réponses ont changé : on supprime l'ancien planning
+        // pour forcer une régénération avec les nouvelles données
+        const { error: deleteError } = await supabase
+          .from('user_planning')
+          .delete()
+          .eq('user_id', session.user.id)
+        if (deleteError) console.log('delete planning error:', deleteError)
+      }
+      window.location.href = '/resultats'
     }
   }
 
   function handlePrev() {
-    if (currentIndex > 0) {
-      const prevStep = visibleSteps[currentIndex - 1]
-      answer('__step', prevStep.id)
-      prev()
-    }
+    if (currentIndex > 0) setCurrentIndex(currentIndex - 1)
   }
 
   if (!currentStep) return null
 
   return (
     <div style={{ paddingTop: '32px', paddingBottom: '60px', maxWidth: '600px', margin: '0 auto' }}>
-
-      {/* Header */}
       <div style={{ marginBottom: '8px' }}>
         <div style={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
@@ -75,10 +104,8 @@ export default function Quiz() {
         )}
       </div>
 
-      {/* Progress */}
       <QuizProgress current={current} total={total} />
 
-      {/* Step content */}
       <div style={{ marginBottom: '32px' }}>
         <QuizStep
           step={currentStep}
@@ -87,7 +114,6 @@ export default function Quiz() {
         />
       </div>
 
-      {/* Navigation */}
       <div style={{ display: 'flex', gap: '12px', justifyContent: 'space-between' }}>
         {currentIndex > 0 ? (
           <button onClick={handlePrev} style={{

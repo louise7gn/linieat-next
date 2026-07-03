@@ -11,7 +11,11 @@ export default function Footer() {
       marginTop: '20px',
     }}>
       <a href="mailto:linieat.contact@gmail.com" style={{ color: 'var(--rose)', textDecoration: 'none' }}>
-        linieat.contact@gmail.com
+        contact.linieat@gmail.com
+      </a>
+      <span style={{ margin: '0 10px', color: 'var(--border)' }}>·</span>
+      <a href="/mentions-legales" style={{ fontSize: '12px', color: 'var(--text-muted)', textDecoration: 'none' }}>
+        Mentions légales
       </a>
     </footer>
   )

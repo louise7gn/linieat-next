@@ -36,14 +36,6 @@ const objectivesFemme = [
     color: '#2E5090',
   },
   {
-    id: 'sante',
-    label: 'Santé & énergie',
-    desc: 'Manger mieux pour se sentir mieux au quotidien. Pas de contrainte physique.',
-    kcal: 0, protein: 1.4,
-    tags: ['Équilibre', 'Anti-inflammatoire', 'Bien-être'],
-    color: '#703040',
-  },
-  {
     id: 'cardio',
     label: 'Performance cardio',
     desc: 'Endurance, énergie et performance sportive. Glucides prioritaires.',
@@ -93,14 +85,6 @@ const objectivesHomme = [
     kcal: 500, protein: 2.6,
     tags: ['Surplus élevé', 'Prog. muscu', 'Protéines max'],
     color: '#5A2080',
-  },
-  {
-    id: 'sante',
-    label: 'Santé & énergie',
-    desc: 'Manger mieux pour se sentir mieux. Équilibre avant tout.',
-    kcal: 0, protein: 1.6,
-    tags: ['Équilibre', 'Variété', 'Bien-être'],
-    color: '#703040',
   },
 ]
 
@@ -246,25 +230,6 @@ export default function Physique() {
               </div>
             ))}
           </div>
-
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <button onClick={() => router.push('/quiz')} style={{
-              background: selectedObj.color, color: 'white',
-              border: 'none', borderRadius: '30px',
-              padding: '12px 24px', fontSize: '13px', fontWeight: '500',
-              cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-            }}>
-              Créer mon profil avec cet objectif →
-            </button>
-            <button onClick={() => router.push('/macros')} style={{
-              background: 'white', color: 'var(--text)',
-              border: '1px solid var(--border)', borderRadius: '30px',
-              padding: '12px 24px', fontSize: '13px',
-              cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
-            }}>
-              Calculer mes macros
-            </button>
-          </div>
         </div>
       )}
 
@@ -275,7 +240,7 @@ export default function Physique() {
           padding: '20px 24px', textAlign: 'center',
           fontSize: '13px', color: 'var(--text-muted)',
         }}>
-          Clique sur un objectif pour voir les détails et les recommandations nutritionnelles 👆
+          Clique sur un objectif pour voir les détails et les recommandations nutritionnelles !
         </div>
       )}
     </div>

@@ -1,8 +1,31 @@
 'use client'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { supabase } from '@/utils/supabaseClient'
 
 export default function CTASection() {
   const router = useRouter()
+  const [quizDone, setQuizDone] = useState(false)
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    const check = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { setChecked(true); return }
+
+      const { data } = await supabase
+        .from('user_quiz_results')
+        .select('user_id')
+        .eq('user_id', user.id)
+        .single()
+
+      setQuizDone(!!data)
+      setChecked(true)
+    }
+    check()
+  }, [])
+
+  if (!checked || quizDone) return null
 
   return (
     <section style={{
