@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
 
 const COOKIE_NAME    = 'linieat_preview_auth'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 jours
@@ -7,12 +6,12 @@ const COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 jours
 export async function POST(request) {
   const { password } = await request.json()
 
-  if (!password || password !== process.env.PREVIEW_PASSWORD) {
+  if (!password || password.trim() !== process.env.PREVIEW_PASSWORD?.trim()) {
     return NextResponse.json({ error: 'Invalid password' }, { status: 401 })
   }
 
-  const cookieStore = cookies()
-  cookieStore.set(COOKIE_NAME, password, {
+  const response = NextResponse.json({ ok: true })
+  response.cookies.set(COOKIE_NAME, password, {
     httpOnly: true,
     secure:   process.env.NODE_ENV === 'production',
     sameSite: 'lax',
@@ -20,5 +19,5 @@ export async function POST(request) {
     path:     '/',
   })
 
-  return NextResponse.json({ ok: true })
+  return response
 }
