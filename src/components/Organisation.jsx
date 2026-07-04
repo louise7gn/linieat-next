@@ -95,7 +95,7 @@ export default function Organisation() {
       {(() => {
         if (!macros || !weeklyCalAvg || !quizData) return null
         const deficit = macros.calories - weeklyCalAvg
-        if (deficit < macros.calories * 0.05) return null  // < 5% → pas de problème
+        if (deficit < macros.calories * 0.1) return null  // < 5% → pas de problème
         const canAddPetitDej = quizData.petit_dej === 'non'
         const canAddGouter   = quizData.gouter    === 'non'
         const canAddDessert  = quizData.dessert   === 'non'
