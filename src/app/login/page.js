@@ -10,13 +10,13 @@ export default function LoginPage() {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [cgAccepted, setCgAccepted] = useState(false)
   const router = useRouter()
 
   const handleLogin = async () => {
     setError('')
     setLoading(true)
 
-    // Vérifier le code partenaire si renseigné
     if (partnerCode.trim()) {
       const { data: ambData, error: ambError } = await supabase
         .from('ambassadors')
@@ -30,7 +30,6 @@ export default function LoginPage() {
         return
       }
 
-      // Stocker l'info ambassadeur pour la récupérer après connexion
       localStorage.setItem('pending_partner_code', partnerCode.toUpperCase().trim())
     }
 
@@ -41,7 +40,7 @@ export default function LoginPage() {
       },
     })
     if (authError) {
-      setError('Erreur lors de l\'envoi du mail.')
+      setError("Erreur lors de l'envoi du mail.")
     } else {
       setSent(true)
     }
@@ -72,6 +71,8 @@ export default function LoginPage() {
       </div>
     </div>
   )
+
+  const canSubmit = !loading && email && cgAccepted
 
   return (
     <div style={{
@@ -146,28 +147,55 @@ export default function LoginPage() {
             />
           </div>
 
+          {/* Case à cocher politique de confidentialité */}
+          <label style={{
+            display: 'flex', alignItems: 'flex-start', gap: '10px',
+            cursor: 'pointer',
+          }}>
+            <input
+              type="checkbox"
+              checked={cgAccepted}
+              onChange={e => setCgAccepted(e.target.checked)}
+              style={{ marginTop: '2px', accentColor: 'var(--rose)', flexShrink: 0 }}
+            />
+            <span style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: '1.6' }}>
+              J'accepte la{' '}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--rose)', textDecoration: 'underline' }}
+                onClick={e => e.stopPropagation()}
+              >
+                politique de confidentialité
+              </a>
+              {' '}et le traitement de mes données de santé.
+            </span>
+          </label>
+
           {error && (
             <p style={{ fontSize: '13px', color: '#e53e3e', margin: 0 }}>{error}</p>
           )}
 
           <button
             onClick={handleLogin}
-            disabled={loading || !email}
+            disabled={!canSubmit}
             style={{
               padding: '14px', borderRadius: '30px', border: 'none',
-              background: loading || !email ? 'var(--border)' : 'var(--rose)',
-              color: loading || !email ? 'var(--text-muted)' : 'white',
+              background: canSubmit ? 'var(--rose)' : 'var(--border)',
+              color: canSubmit ? 'white' : 'var(--text-muted)',
               fontSize: '14px', fontWeight: '500',
-              cursor: loading || !email ? 'not-allowed' : 'pointer',
+              cursor: canSubmit ? 'pointer' : 'not-allowed',
               fontFamily: "'DM Sans', sans-serif",
               transition: 'all 0.15s', marginTop: '4px',
             }}
           >
             {loading ? 'Envoi...' : 'Recevoir mon lien →'}
           </button>
+
         </div>
 
-        {/* Bouton ambassadeur discret */}
+        {/* Espace ambassadeur */}
         <div style={{ textAlign: 'center', marginTop: '32px' }}>
           <button
             onClick={() => router.push('/ambassador/login')}
