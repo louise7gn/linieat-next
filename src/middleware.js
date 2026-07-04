@@ -12,6 +12,7 @@ const COOKIE_MAX_AGE   = 60 * 60 * 24 * 7 // 7 jours
 const PUBLIC_PATHS = [
   '/preview-login',
   '/api/preview-auth',
+  '/auth/callback',
   '/_next',
   '/favicon.ico',
 ]
