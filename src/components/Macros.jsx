@@ -114,12 +114,12 @@ export default function Macros() {
 
           <div>
             <label style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '6px' }}>Poids (kg)</label>
-            <input type="number" value={form.poids} onChange={e => set('poids', e.target.value)} placeholder="Ex : 65" min={30} max={200} style={inputStyle} />
+            <input type="number" value={form.poids} onChange={e => set('poids', e.target.value)} placeholder="Ex : 65" min={25} max={200} style={inputStyle} />
           </div>
 
           <div>
             <label style={{ fontSize: '11px', fontWeight: '500', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '6px' }}>Taille (cm)</label>
-            <input type="number" value={form.taille} onChange={e => set('taille', e.target.value)} placeholder="Ex : 170" min={130} max={220} style={inputStyle} />
+            <input type="number" value={form.taille} onChange={e => set('taille', e.target.value)} placeholder="Ex : 170" min={100} max={220} style={inputStyle} />
           </div>
 
           <div style={{ gridColumn: '1 / -1' }}>

@@ -14,8 +14,8 @@ export function calcMacros(data) {
 
   // ── Sanitisation ──────────────────────────────────────────────────────────
   const genre    = ['femme', 'homme', 'autre'].includes(data.genre) ? data.genre : 'autre'
-  const poids    = Math.max(30,  Math.min(200, Number(data.poids)  || 70))
-  const taille   = Math.max(130, Math.min(220, Number(data.taille) || 170))
+  const poids    = Math.max(25,  Math.min(200, Number(data.poids)  || 70))
+  const taille   = Math.max(100, Math.min(220, Number(data.taille) || 170))
   const age      = Math.max(15,  Math.min(80,  Number(data.age)    || 25))
   const sport    = data.sport    || 'sedentaire'
   const objectif = data.objectif || 'maintien'
