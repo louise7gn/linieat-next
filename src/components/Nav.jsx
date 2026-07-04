@@ -47,8 +47,8 @@ export default function Nav() {
     { href: '/recettes', label: 'Recettes' },
     { href: '/macros', label: 'Besoins nutritifs' },
     { href: '/physique', label: 'Objectifs physiques' },
-    { href: '/organisation', label: 'Organisation' },
-    { href: '/science', label: 'Science' },
+    { href: '/organisation', label: 'Planning' },
+    { href: '/science',      label: 'Sources'  },
   ]
 
   const handleProtectedClick = (e, href) => {
