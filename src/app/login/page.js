@@ -169,7 +169,7 @@ export default function LoginPage() {
               >
                 politique de confidentialité
               </a>
-              {' '}et le traitement de mes données de santé.
+              {' '}et le traitement de mes données.
             </span>
           </label>
 
